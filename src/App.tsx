@@ -1,6 +1,7 @@
 import axios from "axios"
 import useInput from "./hooks/useInput"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { isUndefined } from "lodash"
 
 const App = () => {
   const [user, setUser] = useInput({ id: "", password: "" })
@@ -59,13 +60,31 @@ const App = () => {
     }
   }
 
+  const phoneList = useMemo(() => {
+    return isUndefined(data)
+      ? []
+      : data.map((item) => {
+          return { ...item, name: item.name + "님" }
+        })
+  }, [data])
+
+  const trasnformName = useCallback((arr: { name: string }[]) => {
+    return arr.map((item) => ({ ...item, name: item.name + "님" }))
+  }, [])
+
   useEffect(() => {
     if (reRenderSwitch) {
       setReRenderSwitch(false)
     }
 
-    fetchData().then(({ responseData }) => {
-      setData(responseData)
+    fetchData().then(({ responseData, status }) => {
+      if (status === 200) {
+        setData(responseData)
+
+        return
+      }
+
+      alert("로그인 해주세요.")
     })
   }, [reRenderSwitch])
 
@@ -80,7 +99,7 @@ const App = () => {
         name="password"
       />
       <button onClick={handleLogin}>LOGIN</button>
-      {data.map((item, index: number) => (
+      {phoneList.map((item, index: number) => (
         <li key={index}>{item.name}</li>
       ))}
       <button onClick={handleRefetch}>FETCH</button>
