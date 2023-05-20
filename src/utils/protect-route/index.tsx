@@ -1,21 +1,22 @@
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import { Navigate, Outlet } from "react-router-dom"
-import { isNull } from "lodash"
+import { useSelector } from "react-redux"
+import { getToken } from "../../store/reducer/auth"
 
 export function ProtectRoute({ target }: any) {
-  const token = localStorage.getItem("token")
+  const { accessToken } = useSelector(getToken)
   const logined = useMemo(() => {
-    return !isNull(token)
-  }, [token])
+    return accessToken === "" ? false : true
+  }, [accessToken])
 
   return logined ? <Outlet /> : <Navigate to="/" />
 }
 
 export function PublicRoute({ target }: any) {
-  const token = localStorage.getItem("token")
+  const { accessToken } = useSelector(getToken)
   const logined = useMemo(() => {
-    return !isNull(token)
-  }, [token])
+    return accessToken === "" ? false : true
+  }, [accessToken])
 
   return logined ? <Navigate to="/phone" /> : <Outlet />
 }

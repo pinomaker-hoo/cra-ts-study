@@ -1,8 +1,12 @@
 import { useNavigate } from "react-router-dom"
 import useInput from "../../hooks/useInput"
 import axios from "axios"
+import { useDispatch } from "react-redux"
+import { login } from "../../store/reducer/auth"
 
 const LoginPage = () => {
+  const dispatch = useDispatch()
+
   const [user, setUser] = useInput({ id: "", password: "" })
 
   const navigate = useNavigate()
@@ -16,18 +20,14 @@ const LoginPage = () => {
 
     try {
       const {
-        data: {
-          status,
-          message,
-          responseData: { accessToken },
-        },
+        data: { status, message, responseData },
       } = await axios.post(
         "http://phone.pinodev.shop:8000/api/user/login",
         user
       )
 
       if (status === 200) {
-        localStorage.setItem("token", accessToken)
+        dispatch(login(responseData))
 
         alert(message)
 

@@ -1,8 +1,12 @@
 import axios from "axios"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { isUndefined } from "lodash"
+import { useSelector } from "react-redux"
+import { getToken } from "../../store/reducer/auth"
 
 const PhonePage = () => {
+  const { accessToken } = useSelector(getToken)
+
   const [data, setData] = useState<any[]>([])
   const [reRenderSwitch, setReRenderSwitch] = useState<boolean>(false)
 
@@ -14,7 +18,7 @@ const PhonePage = () => {
         "http://phone.pinodev.shop:8000/api/phone",
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       )
@@ -32,10 +36,6 @@ const PhonePage = () => {
           return { ...item, name: item.name + "님" }
         })
   }, [data])
-
-  const trasnformName = useCallback((arr: { name: string }[]) => {
-    return arr.map((item) => ({ ...item, name: item.name + "님" }))
-  }, [])
 
   useEffect(() => {
     if (reRenderSwitch) {
